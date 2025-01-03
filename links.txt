@@ -1,0 +1,2 @@
+https://en.wikipedia.org/wiki/Chemical_sensor_array
+https://huggingface.co/datasets/seyonec/goodscents_leffingwell?row=28
