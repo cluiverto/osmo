@@ -1,6 +1,4 @@
 # OSMO
-Replication of the Principal Odor Map paper by Brian K. Lee et al. (2023) \[1\].
-The model is implemented such that it integrates with [DeepChem](https://github.com/deepchem/deepchem ).
 
 OSMO is a framework in the field of olfactory intelligence, built upon the latest scientific research and literature focused on digital representation and analysis of scents. The project leverages advances in artificial olfaction to enable computers to "understand" and classify odors based on molecular structure.
 
