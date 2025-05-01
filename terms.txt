@@ -1,4 +1,8 @@
-olfaction
+Olfaction
 Principal Odor Map (POM)
 Message Passing Neural Network (MPNN) -> specific type of graph neural network (GNN)
 GCMS (Gas Chromatography-Mass Spectrometry)
+
+
+Featurisation methods:
+ Mordred, Morgan, and daylight fingerprinting.
