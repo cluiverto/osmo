@@ -37,82 +37,11 @@ def goodscents():
     s = pyrfume.load_data('goodscents/stimuli.csv')
     df = pd.merge(b, s, left_index=True, right_index=True)
     full_df = pd.merge(df, a, on='CID', how='left') 
-    return full_df
+    full_df['Labels'] = full_df['Descriptors'].apply(lambda x: x.split(';') if isinstance(x, str) else [])
+    return full_df.iloc[:, 1:]
 
 
-
-def plot_label_frequencies(df, labels_column='Labels', title='Częstość występowania etykiet zapachowych'):
-    """
-    Tworzy wykres bąbelkowy częstości występowania etykiet zapachowych.
-
-    Parametry:
-    -----------
-    df : pd.DataFrame
-        DataFrame zawierający kolumnę z etykietami.
-    labels_column : str, opcjonalnie
-        Nazwa kolumny zawierającej etykiety (domyślnie 'Labels').
-        Etykiety mogą być listami lub stringami reprezentującymi listy.
-    title : str, opcjonalnie
-        Tytuł wykresu.
-
-    Zwraca:
-    --------
-    fig : plotly.graph_objs._figure.Figure
-        Obiekt wykresu Plotly.
-    """
-
-    # Jeśli etykiety są stringami, konwertujemy je na listy
-    if df[labels_column].dtype == object and df[labels_column].apply(lambda x: isinstance(x, str)).all():
-        df = df.copy()
-        df[labels_column] = df[labels_column].apply(ast.literal_eval)
-
-    # Rozpakuj listy etykiet do osobnych wierszy
-    exploded = df.explode(labels_column)
-
-    # Zlicz częstość występowania każdej etykiety
-    label_counts = exploded[labels_column].value_counts().reset_index()
-    label_counts.columns = ['Labels', 'Count']
-
-    # Tworzenie wykresu bąbelkowego
-    fig = px.scatter(
-        label_counts,
-        x=[1] * len(label_counts),  # Stała pozycja na osi X
-        y='Label',
-        size='Count',
-        size_max=60,
-        labels={'y': 'Etykiety', 'x': ''},
-        title=title,
-        hover_data=['Count']
-    )
-
-    # Dostosowanie wyglądu wykresu
-    fig.update_layout(
-        xaxis=dict(showticklabels=False),
-        yaxis=dict(title='Etykiety'),
-        showlegend=False
-    )
-
-    return fig
-
-def label_frequencies(df, labels_column='Labels', title='Częstość występowania etykiet zapachowych'):
-    """
-    Tworzy wykres bąbelkowy częstości występowania etykiet zapachowych.
-
-    Parametry:
-    -----------
-    df : pd.DataFrame
-        DataFrame zawierający kolumnę z etykietami.
-    labels_column : str, opcjonalnie
-        Nazwa kolumny zawierającej etykiety (domyślnie 'Labels').
-        Etykiety mogą być listami lub stringami reprezentującymi listy.
-    title : str, opcjonalnie
-        Tytuł wykresu.
-
-    Zwraca:
-    --------
-    fig : plotly.graph_objs._figure.Figure
-        Obiekt wykresu Plotly.
-    """
+def label_frequencies(df, labels_column):
 
     # Jeśli etykiety są stringami, konwertujemy je na listy
     if df[labels_column].dtype == object and df[labels_column].apply(lambda x: isinstance(x, str)).all():
@@ -128,13 +57,20 @@ def label_frequencies(df, labels_column='Labels', title='Częstość występowan
 
     return label_counts
 
+def search_scent(keywords, df):
+    # Jeśli keywords jest stringiem, zamień na listę z jednym elementem
+    if isinstance(keywords, str):
+        keywords = [keywords]
+        
+    mask = df['Labels'].apply(lambda labels: all(word in labels for word in keywords))
+    return df.loc[mask, df.columns[-2:]]
 
 
 
-
-
-def pco_occurrence_matrix(df, labels_column='Labels', unique_labels=None):
+def pco_occurrence_matrix(df, counts:int, labels_column='Labels'):
     """Tworzy macierz współwystępowania z wizualizacją"""
+    dfx = label_frequencies(df, labels_column='Labels')
+    unique_labels = dfx.loc[dfx['Count'] > counts, 'Label'].tolist()
     # 1. Przygotowanie danych
     label2idx = {label: i for i, label in enumerate(unique_labels)}
     n = len(unique_labels)
