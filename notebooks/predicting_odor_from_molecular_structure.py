@@ -233,7 +233,7 @@ def plotly_pca_kmeans(similarity_df, n_components=2, n_clusters=5):
     fig.show()
     return coords, clusters, df_plot
 
-def create_features(df):
+def create_all_features(df):
     # Konwersja SMILES na molekuły RDKit
     df['mol'] = df['IsomericSMILES'].apply(Chem.MolFromSmiles)
 
@@ -253,6 +253,13 @@ def create_features(df):
 
     df['daylight_fp'] = df['mol'].apply(daylight_fp)
     return df
+
+def create_mordred_features(df):
+    df['mol'] = df['IsomericSMILES'].apply(Chem.MolFromSmiles)
+    calc = Calculator(descriptors, ignore_3D=True)
+    mordred_features = calc.pandas(df['mol'])
+    return mordred_features
+
 
 if __name__ == "__main__":
     dataset = load_and_merge_data()
