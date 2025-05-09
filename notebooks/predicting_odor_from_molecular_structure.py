@@ -13,6 +13,10 @@ from sklearn.decomposition import PCA
 from sklearn.cluster import KMeans
 from mpl_toolkits.mplot3d import Axes3D  # potrzebne do 3D
 
+from rdkit import Chem
+from rdkit.Chem import AllChem
+from mordred import Calculator, descriptors
+
 
 def load_and_merge_data():
     # Załaduj dane molekuł
@@ -228,6 +232,27 @@ def plotly_pca_kmeans(similarity_df, n_components=2, n_clusters=5):
     
     fig.show()
     return coords, clusters, df_plot
+
+def create_features(df):
+    # Konwersja SMILES na molekuły RDKit
+    df['mol'] = df['IsomericSMILES'].apply(Chem.MolFromSmiles)
+
+    # Mordred
+    calc = Calculator(descriptors, ignore_3D=True)
+    mordred_features = calc.pandas(df['mol'])
+
+    # Morgan fingerprints
+    def morgan_fp(mol, radius=2, nBits=2048):
+        return AllChem.GetMorganFingerprintAsBitVect(mol, radius, nBits=nBits)
+
+    df['morgan_fp'] = df['mol'].apply(morgan_fp)
+
+    # Daylight fingerprints (RDKit)
+    def daylight_fp(mol):
+        return Chem.RDKFingerprint(mol)
+
+    df['daylight_fp'] = df['mol'].apply(daylight_fp)
+    return df
 
 if __name__ == "__main__":
     dataset = load_and_merge_data()
