@@ -42,13 +42,6 @@ def goodscents():
 
 
 def label_frequencies(df, labels_column):
-
-    # Jeśli etykiety są stringami, konwertujemy je na listy
-    if df[labels_column].dtype == object and df[labels_column].apply(lambda x: isinstance(x, str)).all():
-        df = df.copy()
-        df[labels_column] = df[labels_column].apply(ast.literal_eval)
-
-    # Rozpakuj listy etykiet do osobnych wierszy
     exploded = df.explode(labels_column)
 
     # Zlicz częstość występowania każdej etykiety
@@ -56,6 +49,17 @@ def label_frequencies(df, labels_column):
     label_counts.columns = ['Label', 'Count']
 
     return label_counts
+
+def reduce_df(df, minimum: int):
+    df_exploded = df.explode('Labels')
+    label_counts = df_exploded['Labels'].value_counts()
+    labels_to_keep = label_counts[label_counts >= minimum].index
+    df_filtered_exploded = df_exploded[df_exploded['Labels'].isin(labels_to_keep)]
+    df_filtered = df_filtered_exploded.groupby(df_filtered_exploded.index)['Labels'].agg(list)
+    df_filtered = df.loc[df_filtered.index].copy()
+    df_filtered['Labels'] = df_filtered_exploded.groupby(df_filtered_exploded.index)['Labels'].agg(list)
+
+    return df_filtered
 
 def search_scent(keywords, df):
     # Jeśli keywords jest stringiem, zamień na listę z jednym elementem
