@@ -237,9 +237,9 @@ def create_all_features(df):
     # Konwersja SMILES na molekuły RDKit
     df['mol'] = df['IsomericSMILES'].apply(Chem.MolFromSmiles)
 
-    # Mordred
-    calc = Calculator(descriptors, ignore_3D=True)
-    mordred_features = calc.pandas(df['mol'])
+    # # Mordred
+    # calc = Calculator(descriptors, ignore_3D=True)
+    # mordred_features = calc.pandas(df['mol'])
 
     # Morgan fingerprints
     def morgan_fp(mol, radius=2, nBits=2048):
@@ -254,11 +254,15 @@ def create_all_features(df):
     df['daylight_fp'] = df['mol'].apply(daylight_fp)
     return df
 
-def create_mordred_features(df):
+def create_mol(df):
     df['mol'] = df['IsomericSMILES'].apply(Chem.MolFromSmiles)
+    return df
+
+def create_mordred_features(df):
     calc = Calculator(descriptors, ignore_3D=True)
     mordred_features = calc.pandas(df['mol'])
     return mordred_features
+
 
 
 if __name__ == "__main__":
