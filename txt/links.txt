@@ -1,2 +1,7 @@
 https://en.wikipedia.org/wiki/Chemical_sensor_array
 https://huggingface.co/datasets/seyonec/goodscents_leffingwell?row=28
+https://www.sciencedirect.com/science/article/abs/pii/S000326702400847X?via%3Dihub
+
+
+
+http://deepchem.io/tutorials/predict-multi-label-odor-descriptors-using-openpom/#pom
