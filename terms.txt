@@ -6,3 +6,6 @@ GCMS (Gas Chromatography-Mass Spectrometry)
 
 Featurisation methods:
  Mordred, Morgan, and daylight fingerprinting.
+
+
+TomLoxC
